@@ -6,7 +6,8 @@ import {axiosConfig, navLinksConfig} from '../../Config/Config';
 import styled from 'styled-components'
 
 const StyledNav = styled.nav`
-background-color: lightgrey;
+background-color: #e0e0e0;
+border-bottom: 1px black solid;
 display: flex;
 justify-content: space-between;
 align-items: center;

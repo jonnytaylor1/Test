@@ -1,10 +1,11 @@
+//These settings needed for connect-mongo to work
 export const axiosConfig = {
             headers: {
                 'Content-Type': 'application/json'
             },
             withCredentials: true
         }
-
+//Navigation links config
 export const navLinksConfig = {
     notLoggedIn: [
         {url:"/register", title: "Register"},
@@ -17,7 +18,7 @@ export const navLinksConfig = {
         {url:"/",title: "Logout"}
     ]
 }
-
+//Register inputs config
 export const registerInputs = [{
     labelTitle: "Email",
     name: "email",
@@ -44,6 +45,7 @@ export const registerInputs = [{
 }
 ];
 
+//Error messages config
 export const invalidMessage = {
     email: "Please input a valid email",
     password: "Password must be 8 to 64 characters",
@@ -51,7 +53,7 @@ export const invalidMessage = {
     postcode: "Please input a valid UK postcode"
 }
 
-
+//Login inputs config
 export const loginInputs = [{
     labelTitle: "Email",
     name: "email",

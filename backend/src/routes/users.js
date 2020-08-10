@@ -71,7 +71,7 @@ usersRouter.put('/:id', async (req, res, next)=>{
       let {longitude, latitude} = (response.data.result);
       await User.findByIdAndUpdate(req.params.id, {email: email, name: name, location: {type: "Point", coordinates:[longitude, latitude]}}, {useFindAndModify: false}, 
       (err, user)=>{
-        res.status(200).json({message: "User successfully updated", user: user})
+        res.status(200).json({message: "User Successfully Updated", user: user})
       });
     }
     else res.status(409).send("Email Already Exists");
