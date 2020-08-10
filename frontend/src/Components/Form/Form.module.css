@@ -1,0 +1,21 @@
+.Form{
+    background: white;
+    width: 50%;
+    margin: 0 auto;
+    position: relative;
+    z-index: 3;
+}
+h1{
+    text-align: center;
+}
+
+/* Tasks for tomorrow
+
+Sort CSS problem
+
+Make sure remainder of application works as expected (login and register)
+
+Simplify other parts of the application (reusable code and taking functions out into a different file)
+
+https://medium.com/@hammadtariq65/style-encapsulation-in-reactjs-ba4e3212a9f
+*/
