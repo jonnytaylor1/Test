@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {BrowserRouter as Router, Switch, Route, Redirect, useHistory} from 'react-router-dom';
+import {Switch, Route, Redirect, useHistory} from 'react-router-dom';
 import axios from 'axios';
 import Register from './Containers/Register';
 import Login from './Containers/Login';
@@ -44,7 +44,6 @@ function App() {
       <CookieContext.Provider value={{cookieId, setCookieId}}>
       <RequestsContext.Provider value={{requests, setRequests}}>
       <SuccessFailContext.Provider value={{successFailMsg, setSuccessFailMsg}}>
-        <Router>
         <NavBar/>
           <Switch>
             <Route path="/" exact component={Home}/>
@@ -58,7 +57,6 @@ function App() {
             <Route path="" component={()=>{return(<Redirect to='/404'/>)}}/>
             </Switch>
             <GlobalStyles/>
-        </Router>
         </SuccessFailContext.Provider>
         </RequestsContext.Provider>
         </CookieContext.Provider>

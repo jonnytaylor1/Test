@@ -14,7 +14,6 @@ const GeoSchema = new Schema({
 })
 
 
-
 const UserSchema = new mongoose.Schema(
     {
         email: String,
