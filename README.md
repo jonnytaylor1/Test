@@ -1,6 +1,16 @@
-## Gif Demo
+## Gif Demos
 
-![Gif of website](Website.gif)
+**User Requesting Help**
+![Gif of requests](Gif2.gif)
+
+**User Searching Local People to Help (Map View)**
+![Gif of search](Gif3.gif)
+
+**Register and Login**
+![Gif of login](Gif1.gif)
+
+**Updating and Removing Profile**
+![Gif of updating/deleting profile](Gif4.gif)
 
 ## About
 This location based chat application was designed to help isolated individuals get help from local people during the covid pandemic. 
