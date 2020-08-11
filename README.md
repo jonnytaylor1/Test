@@ -1,18 +1,23 @@
 ## Gif Demos
 
 **User Requesting Help**
-![Gif of requests](4.gif)
+
+![Gif of requests](Gif4.gif)
 
 **User Searching Local People to Help (Map View)**
+
 ![Gif of search](Gif1.gif)
 
 **Register and Login**
+
 ![Gif of login](Gif3.gif)
 
 **Updating and Removing Profile**
+
 ![Gif of updating/deleting profile](Gif2.gif)
 
 ## About
+
 This location based chat application was designed to help isolated individuals get help from local people during the covid pandemic. 
 
 The application has been developed using React, NodeJS(Express), MongoDB, SocketIO, and Mapbox. 
