@@ -4,6 +4,11 @@ import ReactMapGl, {Marker} from 'react-mapbox-gl';
 import StarImage from '../../images/Star.png';
 import axios from 'axios';
 import {CookieContext } from '../../Context/Context';
+import styled from 'styled-components';
+
+const StyledMarker = styled(Marker)`
+:hover{ cursor: pointer;}
+`
 
 class MapView extends React.Component {
 
@@ -41,9 +46,9 @@ class MapView extends React.Component {
                 let {requests, name, id} = user;
                 return(
                     //The on click event sends the "other users" information to the parent container (map.js)
-                    <Marker key={user._id} coordinates={user.location.coordinates}>
+                    <StyledMarker key={user._id} coordinates={user.location.coordinates}>
                         <img alt="user marker" onClick={()=> this.props.onClick(requests, name, id)} src={MarkerImage} style={{width: "20px"}}/>    
-                    </Marker>
+                    </StyledMarker>
                 )
             })
           }
