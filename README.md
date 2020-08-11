@@ -1,7 +1,7 @@
 ## Gif Demo
 
-![Gif of website]
-(Website.gif)
+![Gif of website](Website.gif)
+
 ## About
 This location based chat application was designed to help isolated individuals get help from local people during the covid pandemic. 
 
