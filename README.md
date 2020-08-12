@@ -1,4 +1,4 @@
-# Location Based Chat Application (COVID) - MERN stack (Still Completing) 
+# Location Based Chat Application - MERN stack (Still Completing) 
 
 ## About
 
