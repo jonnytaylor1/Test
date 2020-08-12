@@ -2,11 +2,7 @@
 
 ## About
 
-This location based chat application was designed to help isolated individuals get help from local people during the covid pandemic. 
-
-The application has been developed using React, NodeJS(Express), MongoDB, SocketIO, and Mapbox. 
-
-The instant messenger system and home page still need to be implemented. 
+This location based chat application was designed to help isolated individuals get help from local people during the covid pandemic. The application has been developed using React, NodeJS(Express), MongoDB, SocketIO, and Mapbox. The instant messenger system and home page still need to be implemented. 
 
 ## Skills
 
