@@ -1,20 +1,4 @@
-## Gif Demos
-
-**User Requesting Help**
-
-![Gif of requests](Gif4.gif)
-
-**User Searching Local People to Help (Map View)**
-
-![Gif of search](Gif1.gif)
-
-**Register and Login**
-
-![Gif of login](Gif3.gif)
-
-**Updating and Removing Profile**
-
-![Gif of updating/deleting profile](Gif2.gif)
+# Full Stack Web Application - MERN stack (Still Completing) 
 
 ## About
 
@@ -40,6 +24,27 @@ The instant messenger system and home page still need to be implemented.
 * Database Design
 * Mongoose and MongoDB
 * Accessibility
+
+
+## Gif Demos
+
+**User Requesting Help**
+
+![Gif of requests](Gif4.gif)
+
+**User Searching Local People to Help (Map View)**
+
+![Gif of search](Gif1.gif)
+
+**Register and Login**
+
+![Gif of login](Gif3.gif)
+
+**Updating and Removing Profile**
+
+![Gif of updating/deleting profile](Gif2.gif)
+
+
 
 
 
