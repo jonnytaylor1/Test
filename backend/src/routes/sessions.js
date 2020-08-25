@@ -1,6 +1,6 @@
-import express from "express";
-import User from "../models/user";
-import bcrpt from 'bcryptjs';
+const express = require("express");
+const {User} = require("../models/user+request");
+const bcrpt = require('bcryptjs');
 
 const sessionRouter = express.Router();
 
@@ -48,4 +48,4 @@ sessionRouter.get("", (req, res) => {
   }
 });
 
-export default sessionRouter;
+module.exports = sessionRouter;

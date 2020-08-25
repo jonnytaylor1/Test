@@ -43,11 +43,11 @@ class MapView extends React.Component {
 
           if(this.state.isLoaded){
             otherUserMarkers = this.state.otherUsers.map(user=>{
-                let {requests, name, id} = user;
+                let {requests, name, _id} = user;
                 return(
                     //The on click event sends the "other users" information to the parent container (map.js)
                     <StyledMarker key={user._id} coordinates={user.location.coordinates}>
-                        <img alt="user marker" onClick={()=> this.props.onClick(requests, name, id)} src={MarkerImage} style={{width: "20px"}}/>    
+                        <img alt="user marker" onClick={()=> this.props.onClick(requests, name, _id)} src={MarkerImage} style={{width: "20px"}}/>    
                     </StyledMarker>
                 )
             })
@@ -62,7 +62,7 @@ class MapView extends React.Component {
             zoom={[15]}
             style="mapbox://styles/mapbox/streets-v9"
             containerStyle={{
-            height: 'calc(100vh - 4rem)',
+            height: 'calc(100vh - 4rem - 1px)',
             width: '50vw',
         }}>
             <Marker coordinates={this.state.currentUser.location.coordinates}>

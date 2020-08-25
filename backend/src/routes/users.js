@@ -1,7 +1,8 @@
-import express from 'express';
-import User from '../models/user';
-import bcrypt from 'bcryptjs';
-import axios from 'axios';
+const express = require('express');
+const {User} = require('../models/user+request');
+const bcrypt = require('bcryptjs');
+const axios = require('axios');
+
 
 const usersRouter = express.Router();
 
@@ -82,4 +83,4 @@ usersRouter.put('/:id', async (req, res, next)=>{
   }
 })
 
-export default usersRouter;
+module.exports =  usersRouter;

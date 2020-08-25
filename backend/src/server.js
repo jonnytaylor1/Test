@@ -1,11 +1,14 @@
-import express from 'express';
-import mongoose from 'mongoose';
-import session from "express-session";
-import connectStore from "connect-mongo";
-import sessionRouter from "./routes/sessions";
-import cors from 'cors';
-import usersRouter from "./routes/users";
-import requestsRouter from "./routes/requests";
+const express = require('express')
+const mongoose = require('mongoose')
+const session = require("express-session")
+const connectStore = require("connect-mongo")
+const sessionRouter = require("./routes/sessions")
+const cors = require('cors')
+const usersRouter = require("./routes/users")
+const requestsRouter = require("./routes/requests")
+const convoRouter = require('./routes/conversations')
+require('dotenv').config();
+
 
 const {PORT, NODE_ENV, MONGO_URI, SESS_NAME, SESS_SECRET, SESS_LIFETIME} = process.env;
 (async () => {
@@ -38,6 +41,8 @@ app.use(session({
 app.use('/sessions' ,sessionRouter)
 app.use('/users' ,usersRouter)
 app.use('/requests' ,requestsRouter)
+app.use('/conversations', convoRouter)
+
 
 //Error handling
 app.use((err, req, res, next) => {

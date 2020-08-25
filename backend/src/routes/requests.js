@@ -1,10 +1,9 @@
-import express from 'express';
-import {Request} from '../models/request';
-import User from '../models/user';
+const express = require('express');
+const {Request, User} = require('../models/user+request');
 
 const requestsRouter = express.Router();
 
-  //Returns the requests array in the User collection
+//Returns the requests array in the User collection
 requestsRouter.get('/:userId', async (req, res) => {
   try{
     let response = await User.findOne({_id: req.params.userId});
@@ -53,10 +52,4 @@ requestsRouter.post('/', async (req, res, next)=>{
 //Using param instead of query
 
 
-  
-
-
-
-
-
-  export default requestsRouter;
+  module.exports =  requestsRouter;

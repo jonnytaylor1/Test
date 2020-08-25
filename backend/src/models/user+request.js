@@ -1,5 +1,6 @@
-import mongoose, { Schema } from 'mongoose';
-import {RequestSchema} from './request';
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+
 
 mongoose.set('useCreateIndex', true);
 const GeoSchema = new Schema({
@@ -13,8 +14,15 @@ const GeoSchema = new Schema({
     }
 })
 
+const RequestSchema = new Schema(
+    {
+        title: String,
+        details: String,
+    }
+)
 
-const UserSchema = new mongoose.Schema(
+
+const UserSchema = new Schema(
     {
         email: String,
         password: String,
@@ -24,5 +32,5 @@ const UserSchema = new mongoose.Schema(
     }
 )
   
-  const User = mongoose.model('User', UserSchema);
-  export default User;
+module.exports.User = mongoose.model('User', UserSchema);
+module.exports.Request = mongoose.model('Request', RequestSchema);
