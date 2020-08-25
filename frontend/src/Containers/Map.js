@@ -6,14 +6,14 @@ import HorizontalCenter from '../Components/HorizontalCenter/HorizontalCenter';
 import Button from '../Components/Button/Button';
 import MapView from '../Components/MapView/MapView';
 import { CookieContext, UserContext } from '../Context/Context';
-import ExistingConvos from '../Components/ExistingConvos/ExistingConvos';
 import axios from 'axios';
 import ChatUser from '../Components/ChatUser/ChatUser';
 import MessageContainer from '../Components/MessageContainer/MessageContainer';
 import UserMessage from '../Components/UserMessage/UserMessage';
 import ChatUserList from '../Components/ChatUserList';
 import MessageForm from '../Components/MessageForm';
-import { mapConversationsURL } from '../RequestURLs';
+import { mapConversationsURL, conversationsURL, messagesURL, usersURL } from '../RequestURLs';
+import {isExistingConvo, getConversations, removeConnection} from '../services/ChatSystem';
 
 const OtherUsersRequestsContainer = styled.div`
 position:absolute;
@@ -52,7 +52,7 @@ height: 14rem;
 
 
 const Map = (props) => {
-  const initialUserInfo = {requests: null, name: null, id: null};
+    const initialUserInfo = {requests: null, name: null, id: null};
     const [otherUserInfo, setOtherUserInfo] = useState(initialUserInfo);
     const {cookieId, setCookieId} = useContext(CookieContext);
     const [existingConvos, setExistingConvos] = useState([]);
@@ -61,46 +61,32 @@ const Map = (props) => {
     const [messages, setMessages] = useState([]);
     const [convoExists, setConvoExists] = useState(false);
 
+    useEffect(()=>{
+        getConversations(cookieId.userId)
+        .then(convoIdsAndUsers=> setExistingConvos(convoIdsAndUsers));
+    }, []);
 
-    const isExistingConvo = (userId)=>{
-      let convoExists = false;
-      existingConvos.forEach((convo)=>{
-        if(convo.user_data[0]._id === userId) convoExists = true;
-      })
-      setConvoExists(convoExists);
-    }
 
+    //Closes the request information if the conversation being deleted is related
     const closeRequestBox = (conversation)=>{
       if(otherUserInfo.id === conversation.user_data[0]._id) setOtherUserInfo(initialUserInfo);
     }
 
-
-
-    const clickHandler = (requests, name, id)=>{
-
-        isExistingConvo(id);
+    //Displays the request information and conditionally renders the connect button 
+    //(depending if they are already connected or not)
+    const displayRequestInfo = (requests, name, id)=>{
+        let isExisting = isExistingConvo(existingConvos, id);
+        setConvoExists(isExisting);
         setOtherUserInfo({requests: requests, name: name, id:id});
     }
 
-    useEffect(()=>{
-        loadExistingConversations();
-    }, []);
 
-    const loadExistingConversations = async () =>{
-      return new Promise(async (resolve, reject)=>{
-        let response = await axios.get(mapConversationsURL + cookieId.userId);
-        let convoIdsAndUsers = response.data;
-        setExistingConvos(convoIdsAndUsers);
-        resolve(convoIdsAndUsers);
-      })
-    }
-
-
-
+//Create conversation
     const createConversation = async ()=>{
         try {
-            let response = await axios.post('http://localhost:5000/conversations', {helperId: cookieId.userId, requesterId: otherUserInfo.id});
-            let convoIdsAndUsers = await loadExistingConversations();
+            let response = await axios.post(conversationsURL, {helperId: cookieId.userId, requesterId: otherUserInfo.id});
+            let convoIdsAndUsers = await getConversations(cookieId.userId);
+            setExistingConvos(convoIdsAndUsers);
             setConvoExists(true);
             let clickedUserConversation = convoIdsAndUsers.find(convo=>convo.user_data[0]._id===otherUserInfo.id);
             setClickedUser(clickedUserConversation);
@@ -110,21 +96,25 @@ const Map = (props) => {
         }
     }
 
-    const removeUserConnection = async (e, conversation)=>{
-        e.stopPropagation();
-        e.preventDefault();
-        closeRequestBox(conversation);
-        if(window.confirm("Are you sure you want to remove the user connection? All messages will be lost and you will have to find the user on the map again to reconnect.")){
-            await axios.delete('http://localhost:5000/conversations/' + conversation._id)
-            loadExistingConversations();
-          if(clickedUser&&clickedUser._id==conversation._id) closeContainer();
-        }
-      }
+    //Removes the conversation from the database, rerenders the existing conversations, 
+    const removeConversation = async (e, conversation)=>{
+      e.stopPropagation();
+      e.preventDefault();
+      if(window.confirm("Are you sure you want to remove the user connection? All messages will be lost and you will have to find the user on the map again to reconnect.")){
+        await axios.delete(conversationsURL + conversation._id);
+        let convoIdsAndUsers = await getConversations(cookieId.userId);
+         setExistingConvos(convoIdsAndUsers);
+         closeRequestBox(conversation);
 
-      const openMessages = async (e, userId)=>{
+      if(clickedUser&&clickedUser._id==conversation._id) closeContainer();
+    }
+  }
+
+  //Displays the other users messages
+      const openMessages = async (e, userId, existingConvos)=>{
         let clickedUserConversation = existingConvos.find(convo=>convo.user_data[0]._id===userId);
-        let response = await axios.get('http://localhost:5000/conversations/messages/' + clickedUserConversation._id);
-        let response2 = await axios.get('http://localhost:5000/users/'+userId);
+        let response = await axios.get(messagesURL + clickedUserConversation._id);
+        let response2 = await axios.get(usersURL +userId);
         let {requests, name, _id} = response2.data.user;
         let messages = response.data;
         setOtherUserInfo({requests: requests, name: name, id:_id});
@@ -133,10 +123,12 @@ const Map = (props) => {
         setConvoExists(true);
       }
 
+      //Closes the messages container
       const closeContainer = ()=>{
         setClickedUser(null);
         setMessages(null);
       }
+
 
       const sendMessage = async (e, conversation)=>{
         e.preventDefault();
@@ -144,9 +136,8 @@ const Map = (props) => {
         let {user_data} = conversation;
         let receiver = user_data[0]._id;
         let sender = cookieId.userId;
-        let response = await axios.put('http://localhost:5000/conversations/' + conversationId, {receiverId: receiver, senderId: sender, text: inputValue});
+        let response = await axios.put(conversationsURL + conversationId, {receiverId: receiver, senderId: sender, text: inputValue});
         setMessages(response.data.messages);
-        //Retrieve and set updated messages
         setInputValue("");
       }
 
@@ -164,7 +155,7 @@ const Map = (props) => {
     }
 
 
-    let users = existingConvos.map(convo=><ChatUser key={convo._id} deleteClicked={(e)=>removeUserConnection(e, convo)} userClicked={(e)=>openMessages(e, convo.user_data[0]._id)} name={convo.user_data[0].name}/>).reverse();
+    let users = existingConvos.map(convo=><ChatUser key={convo._id} deleteClicked={(e)=>removeConversation(e, convo)} userClicked={(e)=>openMessages(e, convo.user_data[0]._id, existingConvos)} name={convo.user_data[0].name}/>).reverse();
 
 
 
@@ -181,7 +172,7 @@ const Map = (props) => {
     
     return(
         <>
-        <MapView history={props.history} onClick={(requests, name, id)=>clickHandler(requests, name, id)}/>
+        <MapView history={props.history} onClick={(requests, name, id)=>displayRequestInfo(requests, name, id)}/>
         <OtherUsersRequestsContainer>
         {otherUserInfo.name ?
             <>

@@ -3,3 +3,4 @@ export const usersURL = baseURL + 'users/';
 export const conversationsURL = baseURL + 'conversations/';
 export const mapConversationsURL = conversationsURL + 'helper/';
 export const requestsConversationsURL = conversationsURL + 'requester/'
+export const messagesURL = conversationsURL + 'messages/'
