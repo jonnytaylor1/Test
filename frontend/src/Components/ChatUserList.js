@@ -28,14 +28,14 @@ overflow-y: auto;
 `
 
 
-const ChatUserList  = ({title, children}) => {
+const ChatUserList  = ({title, users}) => {
     return(
     <UserListWrapper>
       <StyledInnerDiv>
         <p>{title}</p>
       </StyledInnerDiv>
       <StyledUl>
-      {children}
+      {users}
     </StyledUl>
     </UserListWrapper>
     )

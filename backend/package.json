@@ -21,7 +21,8 @@
     "express": "^4.16.4",
     "express-session": "^1.15.6",
     "joi": "^14.3.1",
-    "mongoose": "^5.10.0"
+    "mongoose": "^5.10.0",
+    "ws": "^7.3.1"
   },
   "devDependencies": {
     "nodemon": "^1.18.10"

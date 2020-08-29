@@ -11,9 +11,8 @@ import ChatUser from '../Components/ChatUser/ChatUser';
 import MessageContainer from '../Components/MessageContainer/MessageContainer';
 import UserMessage from '../Components/UserMessage/UserMessage';
 import ChatUserList from '../Components/ChatUserList';
-import MessageForm from '../Components/MessageForm';
-import { mapConversationsURL, conversationsURL, messagesURL, usersURL } from '../RequestURLs';
-import {isExistingConvo, getConversations, removeConnection} from '../services/ChatSystem';
+import { conversationsURL } from '../RequestURLs';
+import { getConversations } from '../services/ChatSystem';
 
 const OtherUsersRequestsContainer = styled.div`
 position:absolute;
@@ -36,64 +35,74 @@ const RequestTitle = styled.h2`
     hyphens: auto;
 `
 
-
-
 const RequestList = styled.ul`
 max-height: 10rem;
 overflow-y: auto;
 `
 
-const MessageList = styled.ul`
-display: flex;
-flex-direction: column-reverse;
-overflow-y: auto;
-height: 14rem;
-`
 
 
 const Map = (props) => {
     const initialUserInfo = {requests: null, name: null, id: null};
-    const [otherUserInfo, setOtherUserInfo] = useState(initialUserInfo);
     const {cookieId, setCookieId} = useContext(CookieContext);
-    const [existingConvos, setExistingConvos] = useState([]);
-    const [clickedUser, setClickedUser] = useState(null);
     const [inputValue, setInputValue] = useState("");
-    const [messages, setMessages] = useState([]);
-    const [convoExists, setConvoExists] = useState(false);
+
+    //Existing conversations array {convoId, requesterId, helperId, messages}
+    const [existingConvos, setExistingConvos] = useState([]);
+
+    const [displayConnectBtn, setDisplayConnectBtn] = useState(true);
+
+    const [requestInfo, setRequestInfo] = useState(initialUserInfo);
+
+    const [clickedConvo, setClickedConvo] = useState(false);
+
 
     useEffect(()=>{
+      let ws = new WebSocket('ws://localhost:5000/?token=' + cookieId.userId);
         getConversations(cookieId.userId)
-        .then(convoIdsAndUsers=> setExistingConvos(convoIdsAndUsers));
+        .then(convoIdsAndUsers=> {
+          setExistingConvos(convoIdsAndUsers)})
+        ws.onopen = (evt) =>{
+          console.log("Opened");
+        }
+
+        ws.onmessage = (evt)=>{
+          let newMessage = JSON.parse(evt.data);
+          let convoId = clickedConvo._id;
+          setClickedConvo((prevState => {
+            if(prevState) return {...prevState, messages: [...prevState.messages, newMessage]}}))
+        }
+
+        ws.onclose = (evt)=>{
+          console.log("Web Socket Closed");
+        }
+
+        return ()=>{
+          ws.close();
+        }
+
+
     }, []);
 
 
-    //Closes the request information if the conversation being deleted is related
-    const closeRequestBox = (conversation)=>{
-      if(otherUserInfo.id === conversation.user_data[0]._id) setOtherUserInfo(initialUserInfo);
-    }
-
     //Displays the request information and conditionally renders the connect button 
     //(depending if they are already connected or not)
-    const displayRequestInfo = (requests, name, id)=>{
-        let isExisting = isExistingConvo(existingConvos, id);
-        setConvoExists(isExisting);
-        setOtherUserInfo({requests: requests, name: name, id:id});
+    const displayRequestInfo = (id, name, requests)=>{
+      let response = existingConvos.find(convo=> convo.requester._id === id);
+      if(response===undefined) setDisplayConnectBtn(true);
+      else setDisplayConnectBtn(false);
+      setRequestInfo({requests: requests, name: name, id:id});
     }
 
 
 //Create conversation
     const createConversation = async ()=>{
         try {
-            let response = await axios.post(conversationsURL, {helperId: cookieId.userId, requesterId: otherUserInfo.id});
-            let convoIdsAndUsers = await getConversations(cookieId.userId);
-            setExistingConvos(convoIdsAndUsers);
-            setConvoExists(true);
-            let clickedUserConversation = convoIdsAndUsers.find(convo=>convo.user_data[0]._id===otherUserInfo.id);
-            setClickedUser(clickedUserConversation);
-            setMessages([]);
-        } catch (err) {
-            
-        }
+            let response = await axios.post(conversationsURL, {helperId: cookieId.userId, requesterId: requestInfo.id});
+            setExistingConvos([...existingConvos, response.data]);
+            setDisplayConnectBtn(false);
+        } catch (err) {console.log(err);}
+        
     }
 
     //Removes the conversation from the database, rerenders the existing conversations, 
@@ -102,49 +111,49 @@ const Map = (props) => {
       e.preventDefault();
       if(window.confirm("Are you sure you want to remove the user connection? All messages will be lost and you will have to find the user on the map again to reconnect.")){
         await axios.delete(conversationsURL + conversation._id);
-        let convoIdsAndUsers = await getConversations(cookieId.userId);
-         setExistingConvos(convoIdsAndUsers);
+        let updatedConvos = existingConvos.filter(convo=>convo._id!==conversation._id);
+         setExistingConvos(updatedConvos);
          closeRequestBox(conversation);
 
-      if(clickedUser&&clickedUser._id==conversation._id) closeContainer();
+      if(clickedConvo&&clickedConvo._id==conversation._id) closeContainer();
     }
   }
 
+     //Closes the request information if the conversation being deleted is related
+     const closeRequestBox = (conversation)=>{
+      if(requestInfo.id === conversation.requester._id) setRequestInfo(initialUserInfo);
+    }
+
   //Displays the other users messages
-      const openMessages = async (e, userId, existingConvos)=>{
-        let clickedUserConversation = existingConvos.find(convo=>convo.user_data[0]._id===userId);
-        let response = await axios.get(messagesURL + clickedUserConversation._id);
-        let response2 = await axios.get(usersURL +userId);
-        let {requests, name, _id} = response2.data.user;
-        let messages = response.data;
-        setOtherUserInfo({requests: requests, name: name, id:_id});
-        setMessages(messages);
-        setClickedUser(clickedUserConversation);
-        setConvoExists(true);
+      const openMessages = async (e, convo)=>{
+        setClickedConvo(convo);
+        setRequestInfo({requests: convo.requester.requests, name: convo.requester.name, id: convo.requester._id});
+        setDisplayConnectBtn(false);
       }
 
       //Closes the messages container
       const closeContainer = ()=>{
-        setClickedUser(null);
-        setMessages(null);
+        setClickedConvo(false);
       }
 
-
+      //Adds the message to the conversation
       const sendMessage = async (e, conversation)=>{
         e.preventDefault();
         let conversationId = conversation._id;
-        let {user_data} = conversation;
-        let receiver = user_data[0]._id;
-        let sender = cookieId.userId;
-        let response = await axios.put(conversationsURL + conversationId, {receiverId: receiver, senderId: sender, text: inputValue});
-        setMessages(response.data.messages);
+        let message = {receiverId: conversation.requester._id, senderId: cookieId.userId, text: inputValue};
+        await axios.put(conversationsURL + conversationId, message);
+
+        let updatedConvos = existingConvos.map(convo=>{return convo._id === conversationId ? {...convo, messages: [...convo.messages, message]} : convo})
+        let updatedConvo = {...clickedConvo, messages: [...clickedConvo.messages, message]}
+        setExistingConvos(updatedConvos);
+        setClickedConvo(updatedConvo)
         setInputValue("");
       }
 
     let requests;
-    
-    if(otherUserInfo.requests){
-        requests = otherUserInfo.requests.map(req=>{
+
+    if(requestInfo.requests){
+        requests = requestInfo.requests.map(req=>{
             return(
         <UserRequest key={req._id}>
             <RequestTitle>{req.title}</RequestTitle>
@@ -155,16 +164,12 @@ const Map = (props) => {
     }
 
 
-    let users = existingConvos.map(convo=><ChatUser key={convo._id} deleteClicked={(e)=>removeConversation(e, convo)} userClicked={(e)=>openMessages(e, convo.user_data[0]._id, existingConvos)} name={convo.user_data[0].name}/>).reverse();
-
-
+    let users = existingConvos.map(convo=><ChatUser key={convo._id} deleteClicked={(e)=>removeConversation(e, convo)} userClicked={(e)=>openMessages(e, convo)} name={convo.requester.name}/>).reverse();
 
       let messagesUI;
-      if (clickedUser && messages){
-        messagesUI = messages.map(message=>{
-            let type;
-            if(message.senderId === cookieId.userId) type="sender"
-            else type = "receiver"
+      if (clickedConvo){
+        messagesUI = clickedConvo.messages.map(message=>{
+            let type = message.senderId === cookieId.userId ? "sender" : "receiver";
             return(<UserMessage key={message.id} type={type} text={message.text}/>)}).reverse();
       }
 
@@ -172,36 +177,28 @@ const Map = (props) => {
     
     return(
         <>
-        <MapView history={props.history} onClick={(requests, name, id)=>displayRequestInfo(requests, name, id)}/>
+        <MapView history={props.history} onClick={(requests, name, id)=>displayRequestInfo(id, name, requests)}/>
         <OtherUsersRequestsContainer>
-        {otherUserInfo.name ?
+        {requestInfo.name ?
             <>
-             <Title>{otherUserInfo.name} Needs Help With...</Title>
+             <Title>{requestInfo.name} Needs Help With...</Title>
              <RequestList>
                 {requests}
              </RequestList>
-             {!convoExists ?
+             {displayConnectBtn ?
              <HorizontalCenter>
-             <Button onClick={createConversation} margin="2rem 0 0 0" color="primary">Start Chat With {otherUserInfo.name}</Button>
+             <Button onClick={createConversation} margin="2rem 0 0 0" color="primary">Start Chat With {requestInfo.name}</Button>
              </HorizontalCenter>
              :null}
              </>
         : <p>Click a map pointer to reveal the requests of users in need of help</p>}
         </OtherUsersRequestsContainer>
         
-          {clickedUser ? 
-          <MessageContainer onClick={closeContainer} name={clickedUser.user_data[0].name}>
-            <MessageList>
-              {messagesUI}
-              <br></br>
-            </MessageList>
-            <MessageForm onSubmit={(e)=>sendMessage(e, clickedUser)} value={inputValue} onChange={(e)=>{setInputValue(e.target.value)}} />
-          </MessageContainer>
+          {clickedConvo ? 
+          <MessageContainer onClick={closeContainer} name={clickedConvo.requester.name} messagesUI={messagesUI} onSubmit={(e)=>sendMessage(e, clickedConvo)} value={inputValue} onChange={(e)=>{setInputValue(e.target.value)}}/>
           : null}
 
-          <ChatUserList title="Neighbours You're Helping">
-            {users}
-          </ChatUserList>
+          <ChatUserList title="Neighbours You're Helping" users={users}/>
         </>
         )
 }; 

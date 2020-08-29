@@ -1,5 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
+import MessageForm from '../MessageForm';
+
 
 const AbsoluteDiv = styled.div`
 border: 1px solid black;
@@ -35,14 +37,27 @@ border: none;
 :focus {outline:0;}
 `
 
-const MessageContainer = ({name, onClick, children}) => {
+const MessageList = styled.ul`
+display: flex;
+flex-direction: column-reverse;
+overflow-y: auto;
+height: 14rem;
+`
+
+
+
+const MessageContainer = ({name, onClick, messagesUI, onSubmit, value, onChange, children}) => {
     return(
         <MessagesWrapper>
           <StyledInnerDiv>
             <StyledHeading>{name}</StyledHeading>
             <CloseButton onClick={onClick}>X</CloseButton>
           </StyledInnerDiv>
-          {children}
+          <MessageList>
+              {messagesUI}
+              <br></br>
+            </MessageList>
+            <MessageForm onSubmit={onSubmit} value={value} onChange={onChange} />
         </MessagesWrapper>
       )
 }; 

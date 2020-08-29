@@ -7,30 +7,6 @@ const { Conversation, Message } = require('../models/conversation');
 
 const convoRouter = express.Router();
 
-convoRouter.get('/', async (req, res,next)=>{
-    try{
-        let response = await Message.find({});
-        res.send(response);
-    }
-    catch (err){
-        next(err);
-    }
-})
-
-convoRouter.get('/messages/:id', async (req, res,next)=>{
-    try{
-        let convoId = mongoose.Types.ObjectId(req.params.id); 
-        let response = await Conversation.aggregate([
-            {$match: { _id : convoId }},
-            {$project: {messages: 1, _id: 0}}   
-        ]);
-        let messages = response[0].messages;
-        res.status(200).send(messages);
-    }
-    catch (err){
-
-    }
-})
 
 //The user type must either be helper (if they are on the map page) or
 //requester (if they are on the requests page)
@@ -38,22 +14,14 @@ convoRouter.get('/messages/:id', async (req, res,next)=>{
 convoRouter.get('/:userType/:id', async (req, res,next)=>{
     try{
         let currentUserId = req.params.id;
-        console.log(currentUserId);
-        console.log(req.params.userType);
-        let userId = mongoose.Types.ObjectId(currentUserId);
-        let response = await Conversation.aggregate(
-            [
-                {$match: { [req.params.userType] : userId }},
-                {$lookup: {
-                        from: "users",
-                        localField: "requester" ,
-                        foreignField: "_id",
-                        as: "user_data"}
-                },
-                {$project: {"user_data": 1} }
-            ]
-        )
-        res.send(response);
+        let otherUserType;
+        if(req.params.userType === "helper") otherUserType="requester"
+        else otherUserType = "helper"
+        await Conversation.find({[req.params.userType]: currentUserId})
+        .populate(otherUserType, "_id name requests")
+        .exec(async function (err, convos){
+            res.send(convos);
+        })
     }
     catch (err){
         next(err);
@@ -66,8 +34,8 @@ convoRouter.get('/:userType/:id', async (req, res,next)=>{
 convoRouter.post('/', async(req, res,next)=>{
     try{
         let {helperId, requesterId} = req.body;
-        let newConvo = new Conversation({helper: helperId, requester: requesterId, messages:[]});
-        let response = await newConvo.save();
+        let convo = new Conversation({helper: helperId, requester: requesterId, messages:[]});
+        let response = await convo.save().then(c=>c.populate('requester', "_id name requests").execPopulate());
         res.status(201).send(response);
     }
     catch (err){
