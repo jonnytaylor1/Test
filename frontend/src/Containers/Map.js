@@ -56,9 +56,12 @@ const Map = (props) => {
 
     const [clickedConvo, setClickedConvo] = useState(false);
 
+    const [ws, setWs] = useState(null);
+
 
     useEffect(()=>{
-      let ws = new WebSocket('ws://localhost:5000/?token=' + cookieId.userId);
+      let ws = new WebSocket('ws://localhost:5000/?id=' + cookieId.userId);
+      setWs(ws);
         getConversations(cookieId.userId)
         .then(convoIdsAndUsers=> {
           setExistingConvos(convoIdsAndUsers)})
@@ -67,10 +70,24 @@ const Map = (props) => {
         }
 
         ws.onmessage = (evt)=>{
-          let newMessage = JSON.parse(evt.data);
-          let convoId = clickedConvo._id;
-          setClickedConvo((prevState => {
-            if(prevState) return {...prevState, messages: [...prevState.messages, newMessage]}}))
+          let newObject = JSON.parse(evt.data);
+          if(newObject.message){
+            setClickedConvo((prevState => {
+            if(prevState) return {...prevState, messages: [...prevState.messages, newObject.message]}}))
+          }
+          else if(newObject.deletedConversation){
+            setExistingConvos(prevState => {return [...prevState].filter(convo=> convo._id !== newObject.deletedConversation._id)});
+            setClickedConvo(prevState=> {
+                if(prevState._id === newObject.deletedConversation._id) return false;
+                else return prevState;
+              });
+              setRequestInfo(prevState => {
+                if(prevState.id === newObject.deletedConversation.requester) return initialUserInfo;
+                else return prevState;
+              })
+            //TODO remove conversation from conversations
+            //If the conversation is open close the message box
+          }
         }
 
         ws.onclose = (evt)=>{
@@ -79,6 +96,7 @@ const Map = (props) => {
 
         return ()=>{
           ws.close();
+          setWs(null);
         }
 
 
@@ -111,6 +129,7 @@ const Map = (props) => {
       e.preventDefault();
       if(window.confirm("Are you sure you want to remove the user connection? All messages will be lost and you will have to find the user on the map again to reconnect.")){
         await axios.delete(conversationsURL + conversation._id);
+        ws.send(JSON.stringify({_id: conversation._id, helper: conversation.helper, requester: conversation.requester, sendTo: "requester"}));
         let updatedConvos = existingConvos.filter(convo=>convo._id!==conversation._id);
          setExistingConvos(updatedConvos);
          closeRequestBox(conversation);
@@ -126,13 +145,20 @@ const Map = (props) => {
 
   //Displays the other users messages
       const openMessages = async (e, convo)=>{
-        setClickedConvo(convo);
+        if(clickedConvo) closeContainer();
+        setClickedConvo(convo)
         setRequestInfo({requests: convo.requester.requests, name: convo.requester.name, id: convo.requester._id});
         setDisplayConnectBtn(false);
       }
 
       //Closes the messages container
-      const closeContainer = ()=>{
+      const closeContainer = async ()=>{
+        let updatedExistingConvos = await new Promise((resolve, reject)=>{
+          let uc = [...existingConvos].map(convo => {if(convo._id === clickedConvo._id)return clickedConvo; else return convo});
+          resolve(uc);
+        });
+        console.log(updatedExistingConvos);
+        setExistingConvos(updatedExistingConvos);
         setClickedConvo(false);
       }
 

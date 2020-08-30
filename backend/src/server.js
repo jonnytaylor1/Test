@@ -1,4 +1,5 @@
 const express = require('express')
+const http = require('http');
 const mongoose = require('mongoose')
 const app = express();
 let server = require('http').createServer(app);
@@ -11,7 +12,10 @@ const cors = require('cors')
 const usersRouter = require("./routes/users")
 const requestsRouter = require("./routes/requests")
 const convoRouter = require('./routes/conversations')
-const { Conversation } = require('./models/conversation')
+const { Conversation } = require('./models/conversation');
+const axios = require('axios');
+const {httpGet} = require('./httpFunctions');
+let PromiseTool = require('promise-tool');
 require('dotenv').config();
 
 
@@ -31,8 +35,8 @@ const monConnection = mongoose.connection;
 
 const convertURLtoQuery = (URL)=>{
   let params = new URLSearchParams(URL.slice(2));
-  let token = params.get('token');
-  return token;
+  let id = params.get('id');
+  return id;
 }
 
 let wsClients = {};
@@ -40,18 +44,59 @@ monConnection.once('open', ()=>{
   console.log('MongoDB Connected');
 
   const conversationsChangeStream = monConnection.collection('conversations').watch();
-  conversationsChangeStream.on('change', data=>{
+  conversationsChangeStream.on('change', async data=>{
     if(data.operationType==='update'){
     let sentMessage = Object.values(data.updateDescription.updatedFields)[0];
     let {receiverId, senderId} = sentMessage;
 
-    if(wsClients[receiverId]) wsClients[receiverId].send(JSON.stringify(sentMessage));
-    }})
+    if(wsClients[receiverId]) wsClients[receiverId].send(JSON.stringify({message: sentMessage}));
+    }
+    if(data.operationType==='insert'){
+      let conversation = data.fullDocument;
+      try{ 
+        http.get('http://localhost:5000/conversations/newConvo/' + conversation.requester, (resp) => {
+          let data = '';
+          resp.on('data', (chunk) => {
+            data += chunk;
+          });        
+          resp.on('end', () => {
+            let conversationObject = JSON.parse(data)[0];
+            if(wsClients[conversation.requester]) wsClients[conversation.requester].send(JSON.stringify({conversation: conversationObject}));
+            if(wsClients[conversation.helper]) wsClients[conversation.helper].send(JSON.stringify({conversation: conversationObject}));
+          });
+        }).on("error", (err) => {
+          console.log("Error: " + err.message);
+        });
+      // if(wsClients[requester]) wsClients[requester].send(JSON.stringify({conversation: conversation}))
+      }
+      catch (err){console.log(err);}
+    }
+})
+  
   
     wss.on('connection', function connection(ws, req) {
     let userId = convertURLtoQuery(req.url);
     wsClients[userId] = ws;
     console.log('websocket connected user: ' + userId);
+
+    ws.on('message', function incoming(data){
+      let conversation = JSON.parse(data);
+      console.log(conversation);
+      // let type;
+      //type = helper or requester
+      if(conversation.sendTo === "helper" && wsClients[conversation.helper._id]){
+        wsClients[conversation.helper._id].send(JSON.stringify({deletedConversation: {_id: conversation._id, requester: conversation.requester}})); 
+      }
+      if(conversation.sendTo === "requester" && wsClients[conversation.requester._id]){
+        wsClients[conversation.requester._id].send(JSON.stringify({deletedConversation: {_id: conversation._id}})); 
+      }
+    })
+
+
+
+    ws.on('close', function(){
+      delete wsClients[userId];
+    })
 
     //Socket needs to be initiated when there is a change
   })

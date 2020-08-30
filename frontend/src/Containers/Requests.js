@@ -65,11 +65,13 @@ const Requests = (props) => {
     //Existing conversations array {convoId, requesterId, helperId, messages}
     const [existingConvos, setExistingConvos] = useState([]);
     const [clickedConvo, setClickedConvo] = useState(false);
+    const [ws, setWs] = useState(null); 
 
     let history=useHistory();
 
     useEffect(()=>{
-      let ws = new WebSocket('ws://localhost:5000/?token=' + cookieId.userId);
+      let ws = new WebSocket('ws://localhost:5000/?id=' + cookieId.userId);
+      setWs(ws);
         axios.get(requestsConversationsURL + cookieId.userId)
         .then(response=> setExistingConvos(response.data))
         getRequests();
@@ -78,10 +80,21 @@ const Requests = (props) => {
         console.log("Opened");
       }
       ws.onmessage = (evt)=>{
-        let newMessage = JSON.parse(evt.data);
-        let convoId = clickedConvo._id;
-        setClickedConvo((prevState => {
-          if(prevState) return {...prevState, messages: [...prevState.messages, newMessage]}}))
+        let newObject = JSON.parse(evt.data);
+        if(newObject.message){
+          setClickedConvo((prevState => {
+            if(prevState) return {...prevState, messages: [...prevState.messages, newObject.message]}}))
+        }
+        else if(newObject.conversation){
+          setExistingConvos(prevState=>{
+            if(prevState) return [...prevState, newObject.conversation]
+          })
+        }
+        else if(newObject.deletedConversation){
+          setExistingConvos(prevState => {return [...prevState].filter(convo=> convo._id !== newObject.deletedConversation._id)});
+          setClickedConvo(false);
+        }
+
       }
 
       ws.onclose = (evt)=>{
@@ -90,6 +103,7 @@ const Requests = (props) => {
 
       return ()=>{
         ws.close();
+        setWs(null)
       }
 
     }, []);
@@ -187,6 +201,7 @@ const Requests = (props) => {
             e.stopPropagation();
             e.preventDefault();
             if(window.confirm("Are you sure you want to remove the user connection? All messages will be lost and you will have to find the user on the map again to reconnect.")){
+              ws.send(JSON.stringify({_id: conversation._id, helper: conversation.helper, requester: conversation.requester, sendTo: "helper"}));
               await axios.delete(conversationsURL + conversation._id);
               let updatedConvos = existingConvos.filter(convo=>convo._id!==conversation._id);
                setExistingConvos(updatedConvos);
@@ -201,7 +216,12 @@ const Requests = (props) => {
       }
 
     //Closes the messages container
-      const closeContainer = ()=>{
+      const closeContainer = async ()=>{
+        let updatedExistingConvos = await new Promise((resolve, reject)=>{
+          let uc = [...existingConvos].map(convo => {if(convo._id === clickedConvo._id)return clickedConvo; else return convo});
+          resolve(uc);
+        });
+        setExistingConvos(updatedExistingConvos);
         setClickedConvo(false);
       }
 
