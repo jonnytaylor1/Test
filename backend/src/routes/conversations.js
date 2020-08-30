@@ -26,18 +26,6 @@ convoRouter.get('/newConvo/:id', async (req, res,next)=>{
     }
 })
 
-convoRouter.get('/copy/:id', async (req,res,next)=>{
-    try{
-        console.log("router");
-        let convoId = req.params.id;
-        let response = await conversationCopy.findOne({_id: convoId});
-        console.log("router response: " + response);
-        send(response);
-    }
-    catch (err){next(err);}
-})
-
-
 
 
 
@@ -91,9 +79,6 @@ convoRouter.delete('/:id', async(req, res,next)=>{
     try{
         let convoId = req.params.id; 
         let response = await Conversation.findByIdAndRemove(convoId, {useFindAndModify: false});
-        let {_id, helper, requester} = response;
-        let newConvoCopy = new conversationCopy({_id: _id, helper: helper, requester: requester});
-        await newConvoCopy.save();
         res.send(response);
     }
     catch(err){
@@ -103,14 +88,6 @@ convoRouter.delete('/:id', async(req, res,next)=>{
 
 
 
-convoRouter.delete('/copy/:id', async(req, res,next)=>{
-    try{
-        let convoId = req.params.id;
-        await conversationCopy.findByIdAndRemove(convoId, {useFindAndModify: false});
-        res.send();
-    }
-    catch (err){next(err);}
-})
 
 
 
