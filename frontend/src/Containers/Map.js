@@ -85,8 +85,6 @@ const Map = (props) => {
                 if(prevState.id === newObject.deletedConversation.requester) return initialUserInfo;
                 else return prevState;
               })
-            //TODO remove conversation from conversations
-            //If the conversation is open close the message box
           }
         }
 
@@ -230,3 +228,12 @@ const Map = (props) => {
 }; 
 
 export default Map;
+
+
+//TODO 
+
+//Instead of updating the clickedConvo, update the existing convos... regardless if the container is open or not
+
+//Have the conversation Id in the "clickedConvo" then search for the conversation each time existing convos updates
+
+//Check for all other bugs

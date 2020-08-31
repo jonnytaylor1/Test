@@ -2,8 +2,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { User} = require('../models/user+request');
 const { Conversation, Message } = require('../models/conversation');
-const conversationCopy = require('../models/conversationCopy');
-// const {Conversation, Message} = require('../Models/conversation');
 
 
 const convoRouter = express.Router();
