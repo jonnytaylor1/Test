@@ -81,9 +81,18 @@ const Requests = (props) => {
       }
       ws.onmessage = (evt)=>{
         let newObject = JSON.parse(evt.data);
-        if(newObject.message){
-          setClickedConvo((prevState => {
-            if(prevState) return {...prevState, messages: [...prevState.messages, newObject.message]}}))
+        if(newObject.conversationNewMessage){
+          setExistingConvos(prevState=> {return [...prevState].map(convo=>{
+            if(convo._id===newObject.conversationNewMessage._id) return {...convo, messages: [...convo.messages, newObject.conversationNewMessage.message]}
+            else return convo;
+          }) 
+        })
+        setClickedConvo(prevState=> {
+          if(prevState!==false && prevState._id === newObject.conversationNewMessage._id){
+            return {...prevState, messages: [...prevState.messages, newObject.conversationNewMessage.message]}
+          }
+          else return prevState
+        })
         }
         else if(newObject.conversation){
           setExistingConvos(prevState=>{
@@ -229,9 +238,11 @@ const Requests = (props) => {
        const sendMessage = async (e, conversation)=>{
         e.preventDefault();
         let conversationId = conversation._id;
-        let message = {receiverId: conversation.helper, senderId: cookieId.userId, text: messageInput};
+        let receiverId = conversation.helper._id ? conversation.helper._id : conversation.helper;
+        console.log(receiverId);
+        let message = {receiverId: receiverId, senderId: cookieId.userId, text: messageInput};
         await axios.put(conversationsURL + conversationId, message);
-
+        ws.send(JSON.stringify({_id: conversationId, message: message}));
         let updatedConvos = existingConvos.map(convo=>{return convo._id === conversationId ? {...convo, messages: [...convo.messages, message]} : convo})
         let updatedConvo = {...clickedConvo, messages: [...clickedConvo.messages, message]}
         setExistingConvos(updatedConvos);

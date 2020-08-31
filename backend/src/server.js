@@ -45,12 +45,7 @@ monConnection.once('open', ()=>{
 
   const conversationsChangeStream = monConnection.collection('conversations').watch();
   conversationsChangeStream.on('change', async data=>{
-    if(data.operationType==='update'){
-    let sentMessage = Object.values(data.updateDescription.updatedFields)[0];
-    let {receiverId, senderId} = sentMessage;
 
-    if(wsClients[receiverId]) wsClients[receiverId].send(JSON.stringify({message: sentMessage}));
-    }
     if(data.operationType==='insert'){
       let conversation = data.fullDocument;
       try{ 
@@ -67,7 +62,6 @@ monConnection.once('open', ()=>{
         }).on("error", (err) => {
           console.log("Error: " + err.message);
         });
-      // if(wsClients[requester]) wsClients[requester].send(JSON.stringify({conversation: conversation}))
       }
       catch (err){console.log(err);}
     }
@@ -77,19 +71,33 @@ monConnection.once('open', ()=>{
     wss.on('connection', function connection(ws, req) {
     let userId = convertURLtoQuery(req.url);
     wsClients[userId] = ws;
+    console.log(Object.keys(wsClients));
     console.log('websocket connected user: ' + userId);
 
     ws.on('message', function incoming(data){
       let conversation = JSON.parse(data);
-      console.log(conversation);
+      if(conversation.message && wsClients[conversation.message.receiverId]){
+        wsClients[conversation.message.receiverId].send(JSON.stringify({conversationNewMessage: {_id: conversation._id, message: conversation.message}}));
+      }
       // let type;
       //type = helper or requester
-      if(conversation.sendTo === "helper" && wsClients[conversation.helper._id]){
+      if(conversation.sendTo && conversation.sendTo === "helper" && wsClients[conversation.helper._id]){
         wsClients[conversation.helper._id].send(JSON.stringify({deletedConversation: {_id: conversation._id, requester: conversation.requester}})); 
       }
-      if(conversation.sendTo === "requester" && wsClients[conversation.requester._id]){
+      if(conversation.sendTo && conversation.sendTo === "requester" && wsClients[conversation.requester._id]){
         wsClients[conversation.requester._id].send(JSON.stringify({deletedConversation: {_id: conversation._id}})); 
       }
+      if(conversation.deletedConversations){
+        conversation.deletedConversations.forEach(convo => {
+          if(wsClients[convo.helper]){
+            wsClients[convo.helper].send(JSON.stringify({deletedConversation: {_id: convo._id, requester: convo.requester}})); 
+          }
+          if(wsClients[convo.requester]){
+            wsClients[convo.requester].send(JSON.stringify({deletedConversation: {_id: convo._id}})); 
+          }
+        });
+      }
+
     })
 
 

@@ -21,18 +21,21 @@ function App() {
   const [cookieId, setCookieId] = useState("")
   const [requests, setRequests] = useState(null);
   const [successFailMsg, setSuccessFailMsg] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const history = useHistory();
 
   useEffect(()=>{
+    setLoading(true);
     refreshCookie();
   }
   , [])
 
   let refreshCookie = async ()=>{   
     try{
-      let response = await axios.get("http://localhost:5000/sessions", axiosConfig)
-      setCookieId(response.data);
+        let response = await axios.get("http://localhost:5000/sessions", axiosConfig)
+        setCookieId(response.data);
+        setLoading(false);
     }
     catch (err) {history.push('/500')}
   }
@@ -45,6 +48,7 @@ function App() {
       <RequestsContext.Provider value={{requests, setRequests}}>
       <SuccessFailContext.Provider value={{successFailMsg, setSuccessFailMsg}}>
         <NavBar/>
+        {!loading ?
           <Switch>
             <Route path="/" exact component={Home}/>
             <AuthRoute path="/register" loggedIn={cookieId} exact component={Register}/>
@@ -56,6 +60,7 @@ function App() {
             <Route path='/500' exact component={ServerError} />
             <Route path="" component={()=>{return(<Redirect to='/404'/>)}}/>
             </Switch>
+            : null}
             <GlobalStyles/>
         </SuccessFailContext.Provider>
         </RequestsContext.Provider>

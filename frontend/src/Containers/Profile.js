@@ -25,16 +25,33 @@ const Profile = (props) => {
     const [profileInputs, setProfileInputs] = useState({email: "",name: "",postcode: ""});
     const [buttonDisabled, setButtonDisabled] = useState(false);
     const {successFailMsg, setSuccessFailMsg} = useContext(SuccessFailContext);
+    const [ws, setWs] = useState(null);
 
     //Change "update profile" button to disabled if the form isn't valid
     useEffect(() => {
-      let formValid =validateForm({...inputValid});
-      if(formValid) setButtonDisabled(false);
-      else setButtonDisabled(true);
+        let formValid =validateForm({...inputValid});
+        if(formValid) setButtonDisabled(false);
+        else setButtonDisabled(true);
+
     }, [inputValid])
 
     useEffect(()=>{
+        let ws = new WebSocket('ws://localhost:5000/?id=' + cookieId.userId);
+        setWs(ws);
         getUser();
+        ws.onopen = (evt) =>{
+            console.log("Socket Opened");
+          }
+
+        ws.onclose = (evt)=>{
+            console.log("Web Socket Closed");
+          }
+  
+          return ()=>{
+            ws.close();
+            setWs(null);
+          }
+      
     }, []);
 
     const baseUrl = "http://localhost:5000/users/";
@@ -69,6 +86,10 @@ const Profile = (props) => {
             let id = cookieId.userId;
             await axios.delete(baseUrl+id);
             await axios.delete("http://localhost:5000/sessions", axiosConfig);
+            let conversations = await axios.delete("http://localhost:5000/conversations/many/" + id);
+            let data = JSON.stringify({deletedConversations: conversations.data});
+            ws.send(data);
+
             setCookieId(null);
             setSuccessFailMsg("Profile Successfully Removed");
             history.push('/login');

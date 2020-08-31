@@ -64,9 +64,22 @@ convoRouter.post('/', async(req, res,next)=>{
 convoRouter.put('/:id', async(req, res, next)=>{
     try{
         let convoId = req.params.id;
-        let message = new Message(req.body);
+        let {receiverId, senderId, text} = req.body;
+        let message = new Message({receiverId: receiverId, senderId: senderId, text: text});
         let response = await Conversation.findOneAndUpdate({_id: convoId}, {$push: {messages: message}}, {new: true, useFindAndModify: false});
         res.status(201).send(response)
+    }
+    catch (err){
+        next(err)
+    }
+})
+
+convoRouter.delete('/many/:userId', async(req, res, next)=>{
+    try{
+        let userId = req.params.userId;
+        let response = await Conversation.find({$or: [{requester: userId}, {helper: userId}]});
+        await Conversation.deleteMany({$or: [{requester: userId}, {helper: userId}]});
+        res.send(response);
     }
     catch (err){
         next(err)
@@ -83,6 +96,9 @@ convoRouter.delete('/:id', async(req, res,next)=>{
         next(err)
     }
 })
+
+
+
 
 
 

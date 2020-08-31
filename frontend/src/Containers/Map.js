@@ -66,14 +66,23 @@ const Map = (props) => {
         .then(convoIdsAndUsers=> {
           setExistingConvos(convoIdsAndUsers)})
         ws.onopen = (evt) =>{
-          console.log("Opened");
+          console.log("Socket Opened");
         }
 
         ws.onmessage = (evt)=>{
           let newObject = JSON.parse(evt.data);
-          if(newObject.message){
-            setClickedConvo((prevState => {
-            if(prevState) return {...prevState, messages: [...prevState.messages, newObject.message]}}))
+          if(newObject.conversationNewMessage){
+            setExistingConvos(prevState=> {return [...prevState].map(convo=>{
+              if(convo._id===newObject.conversationNewMessage._id) return {...convo, messages: [...convo.messages, newObject.conversationNewMessage.message]}
+              else return convo;
+            }) 
+          })
+          setClickedConvo(prevState=> {
+            if(prevState!==false && prevState._id === newObject.conversationNewMessage._id){
+              return {...prevState, messages: [...prevState.messages, newObject.conversationNewMessage.message]}
+            }
+            else return prevState
+          })
           }
           else if(newObject.deletedConversation){
             setExistingConvos(prevState => {return [...prevState].filter(convo=> convo._id !== newObject.deletedConversation._id)});
@@ -164,9 +173,10 @@ const Map = (props) => {
       const sendMessage = async (e, conversation)=>{
         e.preventDefault();
         let conversationId = conversation._id;
-        let message = {receiverId: conversation.requester._id, senderId: cookieId.userId, text: inputValue};
+        let receiverId = conversation.requester._id ? conversation.requester._id : conversation.requester;
+        let message = {receiverId: receiverId, senderId: cookieId.userId, text: inputValue};
         await axios.put(conversationsURL + conversationId, message);
-
+        ws.send(JSON.stringify({_id: conversationId, message: message}));
         let updatedConvos = existingConvos.map(convo=>{return convo._id === conversationId ? {...convo, messages: [...convo.messages, message]} : convo})
         let updatedConvo = {...clickedConvo, messages: [...clickedConvo.messages, message]}
         setExistingConvos(updatedConvos);

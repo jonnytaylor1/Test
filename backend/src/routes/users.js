@@ -2,6 +2,7 @@ const express = require('express');
 const {User} = require('../models/user+request');
 const bcrypt = require('bcryptjs');
 const axios = require('axios');
+const { Conversation } = require('../models/conversation');
 
 
 const usersRouter = express.Router();
@@ -56,7 +57,7 @@ usersRouter.post('/', async (req, res, next)=>{
 usersRouter.delete('/:id', async (req, res, next)=>{
   try{
   await User.findByIdAndRemove(req.params.id, {useFindAndModify: false}, (err, user)=>{
-    res.status(200).json({message: "User successfully fetched", user: user})
+    res.status(200).json({message: "User successfully deleted", user: user})
     })
   }
   catch (err){next(err)}
