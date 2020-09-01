@@ -152,7 +152,6 @@ const Map = (props) => {
 
   //Displays the other users messages
       const openMessages = async (e, convo)=>{
-        if(clickedConvo) closeContainer();
         setClickedConvo(convo)
         setRequestInfo({requests: convo.requester.requests, name: convo.requester.name, id: convo.requester._id});
         setDisplayConnectBtn(false);
@@ -164,7 +163,6 @@ const Map = (props) => {
           let uc = [...existingConvos].map(convo => {if(convo._id === clickedConvo._id)return clickedConvo; else return convo});
           resolve(uc);
         });
-        console.log(updatedExistingConvos);
         setExistingConvos(updatedExistingConvos);
         setClickedConvo(false);
       }
@@ -242,8 +240,5 @@ export default Map;
 
 //TODO 
 
-//Instead of updating the clickedConvo, update the existing convos... regardless if the container is open or not
-
-//Have the conversation Id in the "clickedConvo" then search for the conversation each time existing convos updates
-
-//Check for all other bugs
+//Try to find any other bugs
+//Tidy up code as much as possible and comment THEN CALL IT A DAY AND FINISH!!!

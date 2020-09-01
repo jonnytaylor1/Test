@@ -77,6 +77,7 @@ const Register = (props) => {
 
     return(
         <>
+        {JSON.stringify(inputValues)}
         {topMessage ? <TopMessage type={topMessage.type} >{topMessage.message}</TopMessage>:null}
         <CenterDiv>
         <Form onSubmit={(e)=>handleSubmit(e)} title="Register">
