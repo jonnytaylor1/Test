@@ -28,23 +28,23 @@ This application was designed to help isolated individuals get help from local p
 
 **User Requesting Help**
 
-![Gif of requests](Gif4.gif)
+![Gif of requests](GIFs/Gif4.gif)
 
 **User Searching Local People to Help (Map View)**
 
-![Gif of search](Gif1.gif)
+![Gif of search](GIFs/Gif1.gif)
 
 **Register and Login**
 
-![Gif of login](Gif3.gif)
+![Gif of login](GIFs/Gif3.gif)
 
 **Updating and Removing Profile**
 
-![Gif of updating/deleting profile](Gif2.gif)
+![Gif of updating/deleting profile](GIFs/Gif2.gif)
 
 **Messaging Other Users and Deleting Conversations (Realtime)**
 
-![Gif of messaging and deleting conversations](Gif5.gif)
+![Gif of messaging and deleting conversations](GIFs/Gif5.gif)
 
 
 
