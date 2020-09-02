@@ -9,8 +9,9 @@ bottom: 0;
 left: 0;
 border: none;
 border-top: solid black 1px;
-width: calc(100% - 1rem);
+width: calc(100% - 3rem);
 padding: 0.5rem;
+padding-right: 2.5rem;
 :focus {outline:0;}
 `
 

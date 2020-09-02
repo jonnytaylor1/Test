@@ -17,12 +17,9 @@
     "cors": "^2.8.5",
     "crypto-js": "^3.1.9-1",
     "dotenv": "^8.2.0",
-    "esm": "^3.2.20",
     "express": "^4.16.4",
     "express-session": "^1.15.6",
-    "joi": "^14.3.1",
     "mongoose": "^5.10.0",
-    "promise-tool": "^1.1.5",
     "ws": "^7.3.1"
   },
   "devDependencies": {

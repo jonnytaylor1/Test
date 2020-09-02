@@ -29,7 +29,7 @@ sessionRouter.delete("", ({ session }, res, next) => {
     if (user) {
       session.destroy((err) => {
         if (err) throw (err);
-        res.clearCookie(process.env.SESS_NAME);
+        res.clearCookie(process.env.SESSION_NAME);
         res.send();
       });
     } 

@@ -4,4 +4,5 @@ export const conversationsURL = baseURL + 'conversations/';
 export const mapConversationsURL = conversationsURL + 'helper/';
 export const requestsConversationsURL = conversationsURL + 'requester/';
 export const messagesURL = conversationsURL + 'messages/';
-export const requestsURL = "http://localhost:5000/requests/";
+export const requestsURL = baseURL + "requests/";
+export const sessionsURL = baseURL + "sessions/"

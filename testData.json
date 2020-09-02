@@ -26,8 +26,4 @@
     "location": {"type": "Point", "coordinates": [-2.38, 51.37]},
     "requests": [{"_id": "4", "title": "Clothes Washing", "details": "I'm really struggling to do the laundry during lockdown. Please somebody help!"}, {"_id": "5","title": "Food", "details": "I could really do with a bigmac. Anybody offering?"}]
 }
-
-
-
-
 ]

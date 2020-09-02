@@ -1,4 +1,4 @@
-import { mapConversationsURL, conversationsURL } from "../RequestURLs";
+import { mapConversationsURL } from "../RequestURLs";
 import axios from 'axios';
 
 

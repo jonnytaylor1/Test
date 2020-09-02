@@ -15,7 +15,7 @@ usersRouter.get('/nearby/:id/:long/:lat', async (req, res, next)=>{
     let users = await User.find({location: { $geoWithin: { $centerSphere: [ [ long, lat ], miles/3963.2 ] } } })
     .where('requests').ne([])
     .where('_id').ne(id)
-    res.status(200).json({message: "Users successfully fetched", users: users})
+    res.json({message: "Users successfully fetched", users: users})
   }
   catch (err) {next(err);}
 })
@@ -24,7 +24,7 @@ usersRouter.get('/nearby/:id/:long/:lat', async (req, res, next)=>{
 usersRouter.get('/:id', async (req, res, next) => {
   try{
     let user = await User.findOne({_id: req.params.id});
-    if(user!==null) res.status(200).json({message: "User successfully fetched", user: user})
+    if(user!==null) res.json({message: "User successfully fetched", user: user})
   }
   catch (err){next(err)}
 });
@@ -57,7 +57,7 @@ usersRouter.post('/', async (req, res, next)=>{
 usersRouter.delete('/:id', async (req, res, next)=>{
   try{
   await User.findByIdAndRemove(req.params.id, {useFindAndModify: false}, (err, user)=>{
-    res.status(200).json({message: "User successfully deleted", user: user})
+    res.json({message: "User successfully deleted", user: user})
     })
   }
   catch (err){next(err)}
@@ -73,7 +73,7 @@ usersRouter.put('/:id', async (req, res, next)=>{
       let {longitude, latitude} = (response.data.result);
       await User.findByIdAndUpdate(req.params.id, {email: email, name: name, location: {type: "Point", coordinates:[longitude, latitude]}}, {useFindAndModify: false}, 
       (err, user)=>{
-        res.status(200).json({message: "User Successfully Updated", user: user})
+        res.json({message: "User Successfully Updated", user: user})
       });
     }
     else res.status(409).send("Email Already Exists");

@@ -29,7 +29,7 @@ requestsRouter.post('/', async (req, res, next)=>{
     try{
       const {userId, requestId} = await req.body;
       await User.findOneAndUpdate({_id: userId}, {$pull: {requests: {_id: requestId}}}, {useFindAndModify:false});
-      res.status(200).json({status: "success", statusCode: 200, message: "Request Deleted"});
+      res.json({status: "success", statusCode: 200, message: "Request Deleted"});
       }
     catch (err) {next(err)}
   });
@@ -39,7 +39,7 @@ requestsRouter.post('/', async (req, res, next)=>{
     try{
     const {_id, title, details, user_id} = req.body;
     await User.findOneAndUpdate({"_id": user_id, "requests._id": _id}, {$set : { "requests.$.title" : title, "requests.$.details": details }},{useFindAndModify:false});
-    res.status(200).json({status: "success", statusCode: 200, message: "Request Updated"});
+    res.json({status: "success", statusCode: 200, message: "Request Updated"});
     }
     catch (err) {next(err)}
   });
@@ -48,7 +48,7 @@ requestsRouter.post('/', async (req, res, next)=>{
 
 
 
-  //https://medium.com/@fullsour/when-should-you-use-path-variable-and-query-parameter-a346790e8a6d
+//https://medium.com/@fullsour/when-should-you-use-path-variable-and-query-parameter-a346790e8a6d
 //Using param instead of query
 
 

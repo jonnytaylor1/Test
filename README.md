@@ -42,7 +42,9 @@ This application was designed to help isolated individuals get help from local p
 
 ![Gif of updating/deleting profile](Gif2.gif)
 
+**Messaging Other Users and Deleting Conversations (Realtime)**
 
+![Gif of messaging and deleting conversations](Gif5.gif)
 
 
 

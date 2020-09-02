@@ -1,19 +1,20 @@
 import React, {useState, useEffect} from 'react';
 import {Switch, Route, Redirect, useHistory} from 'react-router-dom';
 import axios from 'axios';
-import Register from './Containers/Register';
-import Login from './Containers/Login';
-import Home from './Containers/Home';
-import Map from './Containers/Map';
-import Requests from './Containers/Requests';
-import PageNotFound from './Containers/PageNotFound';
-import ServerError from './Containers/ServerError';
-import Profile from './Containers/Profile';
+import Register from './Pages/Register';
+import Login from './Pages/Login';
+import Home from './Pages/Home';
+import Map from './Pages/Map';
+import Requests from './Pages/Requests';
+import PageNotFound from './Pages/PageNotFound';
+import ServerError from './Pages/ServerError';
+import Profile from './Pages/Profile';
 import {UserContext, CookieContext, RequestsContext, SuccessFailContext} from './Context/Context';
 import { AuthRoute, ProtectedRoute } from './hoc/Routes';
 import {axiosConfig} from './Config/Config';
 import GlobalStyles from './GlobalStyles/GlobalStyles';
-import NavBar from './Components/NavBar/NavBar';
+import NavBar from './Components/NavBar';
+import { sessionsURL } from './RequestURLs';
 
 function App() {
 
@@ -33,7 +34,7 @@ function App() {
 
   let refreshCookie = async ()=>{   
     try{
-        let response = await axios.get("http://localhost:5000/sessions", axiosConfig)
+        let response = await axios.get(sessionsURL, axiosConfig)
         setCookieId(response.data);
         setLoading(false);
     }
@@ -71,8 +72,3 @@ function App() {
 }
 
 export default App;
-
-
-//https://itnext.io/mastering-session-authentication-aa29096f6e22
-
-//1. Fix errors
