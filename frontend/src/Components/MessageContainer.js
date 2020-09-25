@@ -34,7 +34,6 @@ right: 0;
 background: none;
 border: none;
 :hover{cursor: pointer};
-:focus {outline:0;}
 `
 
 const MessageList = styled.ul`
@@ -53,9 +52,11 @@ const MessageContainer = ({name, onClick, messagesUI, onSubmit, value, onChange}
             <StyledHeading>{name}</StyledHeading>
             <CloseButton onClick={onClick}>X</CloseButton>
           </StyledInnerDiv>
-          <MessageList>
+          <MessageList tabIndex="0">
               {messagesUI}
-              <br></br>
+              <li>
+            <br></br>
+              </li>
             </MessageList>
             <MessageForm onSubmit={onSubmit} value={value} onChange={onChange} />
         </MessagesWrapper>

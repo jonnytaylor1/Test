@@ -77,16 +77,18 @@ const Profile = (props) => {
     //Removes the users profile, including their requests and user connections. Also their session cookie is removed from the database and reset on the client side
     const removeProfile = async ()=>{
         try{
-            let id = cookieId.userId;
-            await axios.delete(usersURL + id);
-            await axios.delete("http://localhost:5000/sessions", axiosConfig);
-            let conversations = await axios.delete("http://localhost:5000/conversations/many/" + id);
-            let data = JSON.stringify({deletedConversations: conversations.data});
-            ws.send(data);
-
-            setCookieId(null);
-            setSuccessFailMsg("Profile Successfully Removed");
-            history.push('/login');
+            if(window.confirm("Are you sure you want to delete your account? All of your requests and conversations will also be removed.")){
+                let id = cookieId.userId;
+                await axios.delete(usersURL + id);
+                history.push('/');
+                setSuccessFailMsg("Profile Successfully Removed");
+                setCookieId(null);
+                let conversations = await axios.delete("http://localhost:5000/conversations/many/" + id);
+                let data = JSON.stringify({deletedConversations: conversations.data});
+                ws.send(data);
+                await axios.delete("http://localhost:5000/sessions", axiosConfig);
+            }
+            else return
         }
         catch (err) {history.push('/500');}
     }

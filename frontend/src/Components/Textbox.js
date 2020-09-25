@@ -23,8 +23,8 @@ const Textbox = ({title, name, value, onBlur, onChange, maxlength=null}) => {
 
     return(
     <>
-            <StyledLabel>{title}</StyledLabel>
-            <StyledTextbox rows={4} value={value} name={name} onChange={onChange} maxLength={maxlength} onBlur={onBlur}/> 
+            <StyledLabel htmlFor={name} >{title}</StyledLabel>
+            <StyledTextbox rows={4} value={value} id={name} name={name} onChange={onChange} maxLength={maxlength} onBlur={onBlur}/> 
     </>
     )
 }

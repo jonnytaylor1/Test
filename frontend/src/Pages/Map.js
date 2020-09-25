@@ -131,6 +131,7 @@ const Map = (props) => {
       //Adds the message to the conversation
       const sendMessage = async (e, conversation)=>{
         e.preventDefault();
+        if(inputValue !== ""){
         let conversationId = conversation._id;
         let receiverId = conversation.requester._id ? conversation.requester._id : conversation.requester;
         let message = {receiverId: receiverId, senderId: cookieId.userId, text: inputValue};
@@ -141,6 +142,7 @@ const Map = (props) => {
         setExistingConvos(updatedConvos);
         setClickedConvo(updatedConvo)
         setInputValue("");
+        }
       }
 
     let requestsUI;
@@ -183,7 +185,7 @@ const Map = (props) => {
           <MessageContainer onClick={closeContainer} name={clickedConvo.requester.name} messagesUI={messagesUI} onSubmit={(e)=>sendMessage(e, clickedConvo)} value={inputValue} onChange={(e)=>{setInputValue(e.target.value)}}/>
           : null}
 
-          <ChatUserList title="Neighbours You're Helping" users={users}/>
+          <ChatUserList title="Users You're Helping" users={users}/>
         </>
         )
 }; 

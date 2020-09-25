@@ -1,6 +1,8 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const app = express();
+const helmet = require('helmet');
+const compression = require('compression')
 let server = require('http').createServer(app);
 const WebSocket = require('ws');
 const wss = new WebSocket.Server({server: server});
@@ -16,15 +18,18 @@ const { newConvoURL } = require('./RequestURLs');
 require('dotenv').config();
 
 const convertURLQueryToId = (URL)=>{
-  let params = new URLSearchParams(URL.slice(2));
-  let id = params.get('id');
-  return id;
+  return new Promise((resolve, reject)=>{
+    let params = new URLSearchParams(URL.slice(2));
+    let id = params.get('id');
+    resolve(id);
+  })
 }
 
 const {PORT, NODE_ENV, MONGO_URI, SESSION_NAME, SESSION_SECRET, SESSION_LIFETIME} = process.env;
 (async () => {
 try{
-app.disable('x-powered-by'); //Hides info that the app is powered by express
+app.use(compression());
+app.use(helmet()); //protects application from well known web vulnerabilities
 app.use(express.urlencoded({ extended: true })); //Parses url-encoded bodies. Extended: true - The values of the object body can be of any type.
 app.use(express.json()); //Parses JSON bodies
 
@@ -59,8 +64,8 @@ monConnection.once('open', ()=>{
 })
 
 //When a web socket is connected, add it to the wsClients object
-    wss.on('connection', function connection(ws, req) {
-    let userId = convertURLQueryToId(req.url);
+    wss.on('connection', async function connection(ws, req) {
+    let userId = await convertURLQueryToId(req.url);
     wsClients[userId] = ws;
     console.log('Websocket user: ' + userId);
 

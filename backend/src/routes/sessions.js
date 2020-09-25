@@ -1,5 +1,5 @@
 const express = require("express");
-const {User} = require("../models/user+request");
+const {User} = require("../models/user");
 const bcrpt = require('bcryptjs');
 
 const sessionRouter = express.Router();

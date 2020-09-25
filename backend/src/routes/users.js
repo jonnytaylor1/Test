@@ -1,8 +1,7 @@
 const express = require('express');
-const {User} = require('../models/user+request');
+const {User} = require('../models/user');
 const bcrypt = require('bcryptjs');
 const axios = require('axios');
-const { Conversation } = require('../models/conversation');
 
 
 const usersRouter = express.Router();

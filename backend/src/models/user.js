@@ -3,7 +3,8 @@ const Schema = mongoose.Schema;
 
 
 mongoose.set('useCreateIndex', true);
-const GeoSchema = new Schema({
+
+const UserLocationSchema = new Schema({
     type: {
         type: String,
         default: "Point"
@@ -27,7 +28,7 @@ const UserSchema = new Schema(
         email: String,
         password: String,
         name: String,
-        location: GeoSchema,
+        location: UserLocationSchema,
         requests: [RequestSchema]
     }
 )

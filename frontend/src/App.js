@@ -10,7 +10,7 @@ import PageNotFound from './Pages/PageNotFound';
 import ServerError from './Pages/ServerError';
 import Profile from './Pages/Profile';
 import {UserContext, CookieContext, RequestsContext, SuccessFailContext} from './Context/Context';
-import { AuthRoute, ProtectedRoute } from './hoc/Routes';
+import { LoggedOutRoute, LoggedInRoute } from './hoc/Routes';
 import {axiosConfig} from './Config/Config';
 import GlobalStyles from './GlobalStyles/GlobalStyles';
 import NavBar from './Components/NavBar';
@@ -48,19 +48,23 @@ function App() {
       <CookieContext.Provider value={{cookieId, setCookieId}}>
       <RequestsContext.Provider value={{requests, setRequests}}>
       <SuccessFailContext.Provider value={{successFailMsg, setSuccessFailMsg}}>
-        <NavBar/>
+        <header>
+          <NavBar/>
+        </header>
         {!loading ?
+        <main>
           <Switch>
             <Route path="/" exact component={Home}/>
-            <AuthRoute path="/register" loggedIn={cookieId} exact component={Register}/>
-            <AuthRoute path="/login" exact loggedIn={cookieId} component={Login}/>
-            <ProtectedRoute path="/map" exact loggedIn={cookieId} component={Map}/>
-            <ProtectedRoute path="/requests" exact loggedIn={cookieId} component={Requests}/>
-            <ProtectedRoute path="/profile" exact loggedIn={cookieId} component={Profile}/>
+            <LoggedOutRoute path="/register" loggedIn={cookieId} exact component={Register}/>
+            <LoggedOutRoute path="/login" exact loggedIn={cookieId} component={Login}/>
+            <LoggedInRoute path="/map" exact loggedIn={cookieId} component={Map}/>
+            <LoggedInRoute path="/requests" exact loggedIn={cookieId} component={Requests}/>
+            <LoggedInRoute path="/profile" exact loggedIn={cookieId} component={Profile}/>
             <Route path='/404' exact component={PageNotFound} />
             <Route path='/500' exact component={ServerError} />
             <Route path="" component={()=>{return(<Redirect to='/404'/>)}}/>
             </Switch>
+            </main>
             : null}
             <GlobalStyles/>
         </SuccessFailContext.Provider>

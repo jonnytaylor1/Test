@@ -18,7 +18,6 @@ width: 100%;
   cursor: pointer;
   background: lightgrey;
 };
-:focus {outline:0;}
 `
 
 const DeleteButton = styled.input`
@@ -38,7 +37,6 @@ background-size: 0.8rem 1rem;
   background-color: white;
   border-radius: 1rem;
   };
-:focus {outline:0;}
 `
 
 
@@ -49,7 +47,7 @@ const ChatUser = ({classes, deleteClicked, userClicked, name})=>{
       <StyledUser>
       <OpenChatBtn onClick={userClicked} className={classes}>
         <p>{name}</p>
-        <DeleteButton onClick={deleteClicked} type="submit" value=""/>
+        <DeleteButton onClick={deleteClicked} aria-label="Delete User" type="submit" value=""/>
         </OpenChatBtn>
       </StyledUser>
     )

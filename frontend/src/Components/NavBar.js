@@ -28,7 +28,7 @@ font-size: 24px;
 `
 const StyledList = styled.ul`
 display: flex;
-gap: 4rem;
+li:not(:last-child) {margin-right: 4rem;}
 justify-content: space-between;
 `
 

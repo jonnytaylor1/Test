@@ -4,7 +4,7 @@ import styled from 'styled-components';
 const HorizontalCenteredDiv = styled.div`
 display: flex;
 justify-content: center;
-gap: ${props=>{return props.gap}};
+span:first-child {margin-right: ${props=>{return props.gap}}};
 margin: ${props=>{return props.margin}};
 `
 

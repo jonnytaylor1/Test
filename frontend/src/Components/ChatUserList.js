@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 const AbsoluteDiv = styled.div`
 border: 1px solid black;
-position: absolute;
+position: fixed;
 bottom: 0;
 `
 

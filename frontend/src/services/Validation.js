@@ -3,6 +3,7 @@
 //https://www.welivesecurity.com/2017/05/03/no-pointless-password-requirements/
 
 import { invalidMessage } from "../Config/Config";
+import { capitaliseFirstLetter } from "./General";
 
 export const validate = (inputName, inputValue)=> {
 
@@ -47,7 +48,7 @@ export const validate = (inputName, inputValue)=> {
 
 export const inputValidityAndErrorMessage =(value, name)=>{
     if(!value){
-        return [false, "Please Input " + name];
+        return [false, "Please input " + name];
     }
     else{
         let inputValid = validate(name, value);

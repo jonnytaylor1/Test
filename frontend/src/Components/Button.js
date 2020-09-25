@@ -49,10 +49,10 @@ background-color: ${props => {
             return "green";
 
         case "edit":
-            return "#008CBA";
+            return "#2645de";
         
         case "delete":
-            return "#f44336";
+            return "#d00000";
 
         default:
             return

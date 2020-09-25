@@ -23,8 +23,8 @@ const Input = ({title, name, value, onBlur, onChange, maxlength=null, type}) => 
 
     return(
     <>
-            <StyledLabel htmlFor={"Input for " + title}>{title}</StyledLabel>
-            <StyledInput onBlur={onBlur} value={value} name={name} onChange={onChange} maxLength={maxlength} type={type}/> 
+        <StyledLabel htmlFor={name}>{title}</StyledLabel>
+        <StyledInput onBlur={onBlur} value={value} id={name} name={name} onChange={onChange} maxLength={maxlength} type={type}/> 
     </>
     )
 }

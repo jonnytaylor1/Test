@@ -43,7 +43,7 @@ const Container = styled.div`
 display:flex;
 justify-content: center;
 align-content: space-between;
-gap: 2rem;
+span:first-child {margin-right: 2rem}
 margin: 2rem 0 1rem 0;
 `
 const CenteredText = styled.p`
@@ -237,11 +237,6 @@ const Requests = (props) => {
           return(<UserMessage key={message.id} type={type} text={message.text}/>)}).reverse();
     }
 
-
-
-
-    
-
       return (
         <>
         {["New Request", "Edit Request"].includes(formType)  ? <Backdrop resetForm = {resetForm}/> : null} {/* Backdrop appears when a form is active */}
@@ -264,7 +259,7 @@ const Requests = (props) => {
         {requests ? <RequestList>{requests}</RequestList>:null} {/* Users requests */}
         {!requests ? <CenteredText>You currently have no requests!</CenteredText>: null} 
 
-        <ChatUserList title="Neighbours Offering Help" users={users}/>
+        <ChatUserList title="Users Offering Help" users={users}/>
         {clickedConvo ? 
         <MessageContainer onClick={closeContainer} name={clickedConvo.helper.name} messagesUI={messagesUI} onSubmit={(e)=>sendMessage(e, clickedConvo)} value={messageInput} onChange={(e)=>{setMessageInput(e.target.value)}}/>
         :null}

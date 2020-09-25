@@ -50,7 +50,7 @@ export const invalidMessage = {
     email: "Please input a valid email",
     password: "Password must be 8 to 64 characters",
     name: "Name should only include letters",
-    postcode: "Please input a valid UK postcode"
+    postcode: "Please input a UK postcode format"
 }
 
 //Login inputs config
