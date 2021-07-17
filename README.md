@@ -14,6 +14,7 @@ The current design is semi responsive, however due to time constraints it mainly
 * React Lifecycle Methods
 * ES6, ES7, ES8, ES9 JavaScript
 * Styled Components
+* Higher Order Components
 * Context API
 * Composition
 * Middleware
